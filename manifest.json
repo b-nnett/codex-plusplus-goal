@@ -2,6 +2,7 @@
   "id": "co.bennett.goal",
   "name": "Goal",
   "version": "1.0.0",
+  "minRuntime": "0.1.6",
   "githubRepo": "b-nnett/codex-plusplus-goal",
   "description": "Adds Codex's /goal command and active goal UI to the desktop app.",
   "author": {
