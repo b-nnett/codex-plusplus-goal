@@ -1,0 +1,19 @@
+{
+  "id": "co.bennett.goal",
+  "name": "Goal",
+  "version": "0.1.0",
+  "githubRepo": "b-nnett/codex-plusplus-goal",
+  "description": "Adds Codex's /goal command and active goal UI to the desktop app.",
+  "author": {
+    "name": "bennett",
+    "url": "https://github.com/anomalyco/codex-plusplus"
+  },
+  "tags": [
+    "ui",
+    "goals",
+    "productivity",
+    "slash-command"
+  ],
+  "scope": "both",
+  "main": "index.js"
+}
