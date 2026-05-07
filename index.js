@@ -17,6 +17,7 @@ const ROOT_ATTR = "data-codexpp-goal";
 const SLASH_ROW_ATTR = "data-codexpp-goal-slash-row";
 const GOAL_MENTION_NAME = "codexpp-goal";
 const GOAL_MENTION_SELECTOR = `[skill-mention-name="${GOAL_MENTION_NAME}"]`;
+const COMPLETION_ICON_VERSION = "11";
 
 const IPC_GET = "goal:get";
 const IPC_SET = "goal:set";
@@ -53,6 +54,7 @@ module.exports = {
     document.removeEventListener("keydown", state.onKeyDown, true);
     document.removeEventListener("submit", state.onSubmit, true);
     document.removeEventListener("click", state.onClick, true);
+    document.removeEventListener("mouseover", state.onMouseOver, true);
     document.removeEventListener("input", state.onInput, true);
     document.removeEventListener("beforeinput", state.onBeforeInput, true);
     window.removeEventListener("popstate", state.onRouteChange);
@@ -567,6 +569,7 @@ function startRenderer(self, api) {
     onWindowKeyDown: null,
     onSubmit: null,
     onClick: null,
+    onMouseOver: null,
     onInput: null,
     onBeforeInput: null,
     onRouteChange: null,
@@ -625,6 +628,12 @@ function startRenderer(self, api) {
     maybeRunGoalSubmit(state, event, input);
   };
 
+  state.onMouseOver = (event) => {
+    const completionIcon = event.target?.closest?.(`[${ROOT_ATTR}="completion-icon"]`);
+    if (!completionIcon || completionIcon.contains(event.relatedTarget)) return;
+    replayGoalCompletionIcon(completionIcon);
+  };
+
   state.onRouteChange = () => {
     state.threadId = null;
     state.goalSummary = null;
@@ -636,6 +645,7 @@ function startRenderer(self, api) {
   document.addEventListener("keydown", state.onKeyDown, true);
   document.addEventListener("submit", state.onSubmit, true);
   document.addEventListener("click", state.onClick, true);
+  document.addEventListener("mouseover", state.onMouseOver, true);
   document.addEventListener("input", state.onInput, true);
   document.addEventListener("beforeinput", state.onBeforeInput, true);
   window.addEventListener("popstate", state.onRouteChange);
@@ -803,6 +813,272 @@ function installStyle() {
 
     [${ROOT_ATTR}="summary"] {
       width: 100%;
+    }
+
+    [${ROOT_ATTR}="completion-icon"] {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: none;
+      width: 1rem;
+      height: 1rem;
+      border-radius: 9999px;
+      color: inherit;
+    }
+
+    [${ROOT_ATTR}="achieved-divider"][data-icon="flag"] svg {
+      animation: codexpp-goal-flag-shake 3.1s ease-out 1 both;
+      transform-box: fill-box;
+      transform-origin: 35% 85%;
+      will-change: transform;
+    }
+
+    [${ROOT_ATTR}="achieved-divider"][data-icon="soccer-goal"] svg {
+      overflow: visible;
+    }
+
+    [${ROOT_ATTR}="achieved-divider"][data-icon="soccer-goal"] [data-codexpp-goal-soccer-ball="true"] {
+      animation: codexpp-goal-soccer-score 3.1s cubic-bezier(0.2, 0.8, 0.2, 1) 1 both;
+      transform-box: fill-box;
+      transform-origin: center;
+      will-change: opacity, transform;
+    }
+
+    [${ROOT_ATTR}="achieved-divider"][data-icon="soccer-goal"] [data-codexpp-goal-soccer-net="true"] {
+      animation: codexpp-goal-net-recoil 3.1s cubic-bezier(0.2, 0.8, 0.2, 1) 1 both;
+      transform-box: fill-box;
+      transform-origin: 50% 100%;
+      will-change: transform;
+    }
+
+    [${ROOT_ATTR}="achieved-divider"][data-icon="finish-line"] svg {
+      overflow: visible;
+    }
+
+    [${ROOT_ATTR}="achieved-divider"][data-icon="finish-line"] [data-codexpp-goal-race-car-track="true"] {
+      animation: codexpp-goal-finish-drive-x 3.1s linear 1 both;
+      transform-box: fill-box;
+      transform-origin: center;
+      will-change: opacity, transform;
+    }
+
+    [${ROOT_ATTR}="achieved-divider"][data-icon="finish-line"] [data-codexpp-goal-race-car="true"] {
+      animation: codexpp-goal-finish-wiggle 3.1s ease-in-out 1 both;
+      transform-box: fill-box;
+      transform-origin: center;
+      will-change: transform;
+    }
+
+    [${ROOT_ATTR}="achieved-divider"][data-icon="dartboard"] svg {
+      overflow: visible;
+    }
+
+    [${ROOT_ATTR}="achieved-divider"][data-icon="dartboard"] [data-codexpp-goal-dart="true"] {
+      animation: codexpp-goal-dart-hit 0.78s cubic-bezier(0.18, 0.84, 0.22, 1) 1 both;
+      transform-box: fill-box;
+      transform-origin: 80% 52%;
+      will-change: opacity, transform;
+    }
+
+    [${ROOT_ATTR}="achieved-divider"][data-icon="dartboard"] [data-codexpp-goal-dart="true"]:nth-of-type(2) {
+      animation-delay: 0.82s;
+    }
+
+    [${ROOT_ATTR}="achieved-divider"][data-icon="dartboard"] [data-codexpp-goal-dart="true"]:nth-of-type(3) {
+      animation-delay: 1.64s;
+    }
+
+    [${ROOT_ATTR}="achieved-divider"][data-icon="golf"] svg {
+      overflow: visible;
+    }
+
+    [${ROOT_ATTR}="achieved-divider"][data-icon="golf"] [data-codexpp-goal-golf-ball="true"] {
+      animation: codexpp-goal-golf-putt 3.1s cubic-bezier(0.16, 0.82, 0.24, 1) 1 both;
+      transform-box: fill-box;
+      transform-origin: center;
+      will-change: opacity, transform;
+    }
+
+    [${ROOT_ATTR}="achieved-divider"][data-icon="golf"] [data-codexpp-goal-golf-flag="true"] {
+      animation: codexpp-goal-golf-flag-twitch 3.1s ease-out 1 both;
+      transform-box: fill-box;
+      transform-origin: 6.1px 4.25px;
+      will-change: transform;
+    }
+
+    @keyframes codexpp-goal-flag-shake {
+      0%, 100% {
+        transform: rotate(0deg);
+      }
+      6% {
+        transform: rotate(-8deg);
+      }
+      12% {
+        transform: rotate(7deg);
+      }
+      18% {
+        transform: rotate(-6deg);
+      }
+      24% {
+        transform: rotate(5deg);
+      }
+      32% {
+        transform: rotate(-3deg);
+      }
+      42% {
+        transform: rotate(2deg);
+      }
+      55% {
+        transform: rotate(0deg);
+      }
+    }
+
+    @keyframes codexpp-goal-soccer-score {
+      0% {
+        opacity: 0;
+        transform: translate(-7px, 1.25px) scale(0.72);
+      }
+      10% {
+        opacity: 1;
+        transform: translate(-5.75px, 0.8px) scale(0.78);
+      }
+      35% {
+        transform: translate(-1.8px, -3.9px) scale(0.9);
+      }
+      55% {
+        transform: translate(0.35px, 0.05px) scale(1.03);
+      }
+      67% {
+        transform: translate(-0.18px, -0.4px) scale(0.99);
+      }
+      80%, 100% {
+        opacity: 1;
+        transform: translate(0, 0) scale(1);
+      }
+    }
+
+    @keyframes codexpp-goal-net-recoil {
+      0%, 52% {
+        transform: translateY(0) scaleY(1);
+      }
+      55% {
+        transform: translateY(0.32px) scaleY(0.91);
+      }
+      63% {
+        transform: translateY(-0.18px) scaleY(1.045);
+      }
+      73% {
+        transform: translateY(0.08px) scaleY(0.985);
+      }
+      84%, 100% {
+        transform: translateY(0) scaleY(1);
+      }
+    }
+
+    @keyframes codexpp-goal-finish-drive-x {
+      0% {
+        opacity: 0;
+        transform: translateX(-16px);
+      }
+      8% {
+        opacity: 1;
+        transform: translateX(-13.44px);
+      }
+      88% {
+        opacity: 1;
+        transform: translateX(12.16px);
+      }
+      100% {
+        opacity: 0;
+        transform: translateX(16px);
+      }
+    }
+
+    @keyframes codexpp-goal-finish-wiggle {
+      0%, 100% {
+        transform: translateY(0) rotate(0deg);
+      }
+      18% {
+        transform: translateY(-0.45px) rotate(1.4deg);
+      }
+      38% {
+        transform: translateY(0.5px) rotate(-1.5deg);
+      }
+      58% {
+        transform: translateY(-0.32px) rotate(1deg);
+      }
+      76% {
+        transform: translateY(0.2px) rotate(-0.6deg);
+      }
+    }
+
+    @keyframes codexpp-goal-dart-hit {
+      0% {
+        opacity: 0;
+        transform: translate(-9px, -6px) rotate(-18deg) scale(0.82);
+      }
+      18% {
+        opacity: 1;
+        transform: translate(-7px, -4.8px) rotate(-15deg) scale(0.86);
+      }
+      72% {
+        transform: translate(-1.1px, -0.8px) rotate(-4deg) scale(0.96);
+      }
+      84% {
+        transform: translate(0.25px, 0.18px) rotate(1.5deg) scale(1.04);
+      }
+      92% {
+        transform: translate(-0.1px, -0.08px) rotate(-0.8deg) scale(0.99);
+      }
+      100% {
+        opacity: 1;
+        transform: translate(0, 0) rotate(0deg) scale(1);
+      }
+    }
+
+    @keyframes codexpp-goal-golf-putt {
+      0% {
+        opacity: 0;
+        transform: translate(-8.4px, 3.6px) scale(0.82);
+      }
+      12% {
+        opacity: 1;
+        transform: translate(-6.4px, 2.8px) scale(0.9);
+      }
+      48% {
+        transform: translate(-1.9px, 1.05px) scale(1);
+      }
+      66% {
+        opacity: 1;
+        transform: translate(0, -0.12px) scale(1.05);
+      }
+      73% {
+        opacity: 1;
+        transform: translate(0, 0.48px) scale(0.76);
+      }
+      80% {
+        opacity: 0;
+        transform: translate(0, 0.75px) scale(0.28);
+      }
+      100% {
+        opacity: 0;
+        transform: translate(0, 0.75px) scale(0.28);
+      }
+    }
+
+    @keyframes codexpp-goal-golf-flag-twitch {
+      0%, 66%, 100% {
+        transform: rotate(0deg);
+      }
+      72% {
+        transform: rotate(-1.8deg);
+      }
+      80% {
+        transform: rotate(1deg);
+      }
+      88% {
+        transform: rotate(-0.4deg);
+      }
     }
 
     @keyframes codexpp-goal-pulse {
@@ -1472,10 +1748,13 @@ function renderGoalTimelineDivider(goal) {
   }
   divider.dataset.goalSource = "state";
   const label = `Goal achieved in ${formatDuration(goalDurationSeconds(goal))}`;
-  if (divider.dataset.label !== label || divider.dataset.layout !== "compact") {
+  const icon = resolveGoalCompletionIcon(divider, `${goal.goalId || ""}:${goal.objective || ""}:${label}`);
+  if (divider.dataset.label !== label || divider.dataset.layout !== "compact" || divider.dataset.icon !== icon.key || divider.dataset.iconVersion !== COMPLETION_ICON_VERSION) {
     divider.dataset.label = label;
     divider.dataset.layout = "compact";
-    divider.innerHTML = goalTimelineDividerHtml(flagIconSvg(), label);
+    divider.dataset.icon = icon.key;
+    divider.dataset.iconVersion = COMPLETION_ICON_VERSION;
+    divider.innerHTML = goalTimelineDividerHtml(icon.svg, label, { cycleIcon: true });
   }
   placeGoalTimelineDivider(divider, goal, conversation);
 }
@@ -1527,12 +1806,15 @@ function renderGoalChangeDivider(state) {
   if (divider.parentElement !== list) list.append(divider);
 }
 
-function goalTimelineDividerHtml(icon, label) {
+function goalTimelineDividerHtml(icon, label, options = {}) {
+  const iconHtml = options.cycleIcon
+    ? `<span ${ROOT_ATTR}="completion-icon">${icon}</span>`
+    : icon;
   return (
     '<div class="text-size-chat flex items-center gap-2 text-token-text-secondary">' +
     '<div class="flex-1 border-t border-token-border-default"></div>' +
     '<div class="flex items-center gap-1 whitespace-nowrap">' +
-    icon +
+    iconHtml +
     `<span>${escapeHtml(label)}</span>` +
     "</div>" +
     '<div class="flex-1 border-t border-token-border-default"></div>' +
@@ -1848,6 +2130,7 @@ function findTranscriptList(conversation = findConversationContainer()) {
 function renderTranscriptGoalCompletionDividers() {
   const turns = findGoalCompletionCandidateTurns();
   const valid = new Set();
+  let completionIndex = 0;
   for (const turn of turns) {
     const completion = parseGoalCompletionText(turn.textContent || "");
     if (!completion) continue;
@@ -1862,10 +2145,14 @@ function renderTranscriptGoalCompletionDividers() {
     divider.dataset.goalSource = "transcript";
     divider.dataset.goalCompletionTurn = turn.getAttribute("data-turn-key") || "";
     const label = `Goal achieved in ${completion.label}`;
-    if (divider.dataset.label !== label || divider.dataset.layout !== "compact") {
+    const icon = resolveGoalCompletionIcon(divider, `${divider.dataset.goalCompletionTurn}:${label}:${turn.textContent || ""}`, completionIndex);
+    completionIndex += 1;
+    if (divider.dataset.label !== label || divider.dataset.layout !== "compact" || divider.dataset.icon !== icon.key || divider.dataset.iconVersion !== COMPLETION_ICON_VERSION) {
       divider.dataset.label = label;
       divider.dataset.layout = "compact";
-      divider.innerHTML = goalTimelineDividerHtml(flagIconSvg(), label);
+      divider.dataset.icon = icon.key;
+      divider.dataset.iconVersion = COMPLETION_ICON_VERSION;
+      divider.innerHTML = goalTimelineDividerHtml(icon.svg, label, { cycleIcon: true });
     }
     valid.add(divider);
   }
@@ -2971,6 +3258,121 @@ function flagIconSvg() {
     '<path d="M6 4.25 14.5 7.1 6 9.95V4.25Z" fill="currentColor"/>' +
     "</svg>"
   );
+}
+
+function soccerGoalIconSvg() {
+  return (
+    '<svg class="icon-xs shrink-0" width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true">' +
+    '<path d="M3.25 15.25V6.75A2.5 2.5 0 0 1 5.75 4.25h8.5a2.5 2.5 0 0 1 2.5 2.5v8.5" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round"/>' +
+    '<g data-codexpp-goal-soccer-net="true">' +
+    '<path d="M6.25 15.25V4.75M9 15.25V4.5M11.75 15.25V4.75M14.5 15.25V5.25M3.75 8h12.5M3.75 11h12.5" stroke="currentColor" stroke-width=".75" stroke-linecap="round" opacity=".65"/>' +
+    "</g>" +
+    '<circle cx="10" cy="14.25" r="1.7" fill="currentColor" data-codexpp-goal-soccer-ball="true"/>' +
+    "</svg>"
+  );
+}
+
+function finishLineIconSvg() {
+  return (
+    '<svg class="icon-xs shrink-0" width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true">' +
+    '<path d="M8.25 3.25h5.5v13.5h-5.5V3.25Z" stroke="currentColor" stroke-width="1.05" stroke-linejoin="round"/>' +
+    '<path d="M8.25 3.25h2.75V5.5H8.25V3.25ZM11 5.5h2.75v2.25H11V5.5ZM8.25 7.75h2.75V10H8.25V7.75ZM11 10h2.75v2.25H11V10ZM8.25 12.25h2.75v2.25H8.25v-2.25ZM11 14.5h2.75v2.25H11V14.5Z" fill="currentColor"/>' +
+    '<g data-codexpp-goal-race-car-track="true">' +
+    '<g data-codexpp-goal-race-car="true">' +
+    '<path d="M3.4 8.1h6.85L12.6 10l-2.35 1.9H3.4a1.25 1.25 0 0 1-1.25-1.25v-1.3A1.25 1.25 0 0 1 3.4 8.1Z" fill="currentColor"/>' +
+    '<path d="M5.15 8.1 6.2 7.15h2.35l1.05.95M5.15 11.9l1.05.95h2.35l1.05-.95" stroke="currentColor" stroke-width=".72" stroke-linecap="round" stroke-linejoin="round"/>' +
+    '<path d="M3.1 7.62h1.55M3.1 12.38h1.55M9.2 7.62h1.55M9.2 12.38h1.55" stroke="currentColor" stroke-width="1.05" stroke-linecap="round"/>' +
+    "</g>" +
+    "</g>" +
+    "</svg>"
+  );
+}
+
+function dartboardIconSvg() {
+  const dartOne = dartSvg("true");
+  const dartTwo = dartSvg("true", "M6.6 14.15 9.72 10.62", "M9.72 10.62 12.55 10", "M5.45 15.25 6.15 12.9 7.75 14.55 5.45 15.25Z", "M12.55 10 10.45 10.75 11.75 11.58 12.55 10Z");
+  const dartThree = dartSvg("true", "M14.05 5.65 10.52 9.08", "M10.52 9.08 10 12", "M15.15 4.55 12.8 5.25 14.45 6.9 15.15 4.55Z", "M10 12 10.75 9.9 11.58 11.22 10 12Z");
+  return (
+    '<svg class="icon-xs shrink-0" width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true">' +
+    '<circle cx="10" cy="10" r="6.75" stroke="currentColor" stroke-width=".9" opacity=".42"/>' +
+    '<circle cx="10" cy="10" r="4.25" stroke="currentColor" stroke-width=".7" opacity=".38"/>' +
+    '<circle cx="10" cy="10" r="1.85" fill="currentColor"/>' +
+    '<path d="M10 3.25V16.75M3.25 10h13.5M5.25 5.25l9.5 9.5M14.75 5.25l-9.5 9.5" stroke="currentColor" stroke-width=".48" stroke-linecap="round" opacity=".32"/>' +
+    dartOne +
+    dartTwo +
+    dartThree +
+    "</svg>"
+  );
+}
+
+function dartSvg(marker, shaftA = "M6.2 5.65 9.62 9.08", shaftB = "M9.62 9.08 12.55 10", tail = "M5.05 4.55 7.4 5.25 5.75 6.9 5.05 4.55Z", tip = "M12.55 10 10.45 9.25 11.78 8.42 12.55 10Z") {
+  return (
+    `<g data-codexpp-goal-dart="${marker}">` +
+    `<path d="${shaftA}" stroke="currentColor" stroke-width="1.15" stroke-linecap="round"/>` +
+    `<path d="${shaftB}" stroke="currentColor" stroke-width="1.15" stroke-linecap="round"/>` +
+    `<path d="${tail}" fill="currentColor"/>` +
+    `<path d="${tip}" fill="currentColor"/>` +
+    "</g>"
+  );
+}
+
+function golfIconSvg() {
+  return (
+    '<svg class="icon-xs shrink-0" width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true">' +
+    '<ellipse cx="10.6" cy="15" rx="6.6" ry="1.65" stroke="currentColor" stroke-width="1.05" opacity=".55"/>' +
+    '<ellipse cx="10.7" cy="12.95" rx="2.65" ry="1" fill="currentColor" opacity=".75"/>' +
+    '<path d="M10.7 15.8V3.25" stroke="currentColor" stroke-width="1.35" stroke-linecap="round"/>' +
+    '<g data-codexpp-goal-golf-flag="true">' +
+    '<path d="M11.25 3.75 16.25 5.95 11.25 8.15V3.75Z" fill="currentColor"/>' +
+    "</g>" +
+    '<circle cx="10.7" cy="12.95" r="1.18" fill="currentColor" data-codexpp-goal-golf-ball="true"/>' +
+    "</svg>"
+  );
+}
+
+function goalCompletionIcon(seed, offset = 0) {
+  const icons = goalCompletionIconEntries();
+  const index = (stableHash(seed) + Math.max(0, Number(offset) || 0)) % icons.length;
+  const [key, render] = icons[index];
+  return { key, svg: render() };
+}
+
+function resolveGoalCompletionIcon(_divider, seed, offset = 0) {
+  return goalCompletionIcon(seed, offset);
+}
+
+function replayGoalCompletionIcon(button) {
+  const divider = button.closest?.(`[${ROOT_ATTR}="achieved-divider"]`);
+  if (!(divider instanceof HTMLElement)) return;
+  const icon = completionIconByKey(divider.dataset.icon);
+  if (!icon) return;
+  button.innerHTML = icon.svg;
+}
+
+function completionIconByKey(key) {
+  const entry = goalCompletionIconEntries().find(([entryKey]) => entryKey === key);
+  if (!entry) return null;
+  return { key: entry[0], svg: entry[1]() };
+}
+
+function goalCompletionIconEntries() {
+  return [
+    ["flag", flagIconSvg],
+    ["soccer-goal", soccerGoalIconSvg],
+    ["finish-line", finishLineIconSvg],
+    ["dartboard", dartboardIconSvg],
+    ["golf", golfIconSvg],
+  ];
+}
+
+function stableHash(value) {
+  let hash = 2166136261;
+  const text = String(value || "");
+  for (let i = 0; i < text.length; i += 1) {
+    hash ^= text.charCodeAt(i);
+    hash = Math.imul(hash, 16777619);
+  }
+  return hash >>> 0;
 }
 
 function rotateIconSvg() {

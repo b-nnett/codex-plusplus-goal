@@ -1,6 +1,8 @@
 # Goal
 
-Codex++ tweak that brings Codex CLI's `/goal` workflow into the desktop GUI.
+A [Codex++](https://github.com/b-nnett/codex-plusplus) tweak that brings Codex CLI's `/goal` workflow into the desktop GUI.
+
+![Goal UI in Codex](assets/goal-ui.png)
 
 ## Features
 
